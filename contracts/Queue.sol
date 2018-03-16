@@ -11,8 +11,13 @@ contract Queue {
 	/* State variables */
 	uint8 size = 5;
 	// YOUR CODE HERE
+	uint8 timeLimit = 200;
+	struct Order {
+		address owner;
+		uint timestamp;  // the timestamp the order becomes first in the queue
+	}
 	uint8 curNumber = 0;
-	address[] storage orders;
+	Order[] storage orders;
 
 
 	/* Add events */
@@ -21,7 +26,7 @@ contract Queue {
 	/* Add constructor */
 	// YOUR CODE HERE
 	function Queue() {
-		orders = new address[size];
+		orders = new Order[size];
 	}
 
 	/* Returns the number of people waiting in line */
@@ -39,14 +44,14 @@ contract Queue {
 	/* Returns the address of the person in the front of the queue */
 	function getFirst() constant returns(address) {
 		// YOUR CODE HERE
-		return orders[0];
+		return orders[0].address;
 	}
 	
 	/* Allows `msg.sender` to check their position in the queue */
 	function checkPlace() constant returns(uint8) {
 		// YOUR CODE HERE
 		for (uint8 i = 0; i < curNumber; i++) {
-			if (orders[i] == msg.sender) {
+			if (orders[i].address == msg.sender) {
 				return i;
 			}
 		}
@@ -59,6 +64,9 @@ contract Queue {
 	 */
 	function checkTime() {
 		// YOUR CODE HERE
+		if (now - orders[0].timestamp > timeLimit) {
+			dequeue();
+		}
 	}
 	
 	/* Removes the first person in line; either when their time is up or when
@@ -70,6 +78,7 @@ contract Queue {
 			orders[i] = orders[i+1];
 		}
 		orders[curNumber - 1] = address(0);
+		orders[0] = now;
 		curNumber --;
 	}
 
@@ -77,7 +86,7 @@ contract Queue {
 	function enqueue(address addr) {
 		// YOUR CODE HERE
 		if (curNumber != size) {
-			orders[curNumber-1] = addr;
+			orders[curNumber-1] = Order(addr, now);
 			curNumber ++;
 		}
 	}
