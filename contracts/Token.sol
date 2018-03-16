@@ -11,6 +11,7 @@ import './interfaces/ERC20Interface.sol';
 contract Token is ERC20Interface {
 	// YOUR CODE HERE
 	mapping (address => uint256) balanceBook;
+	uint256 public totalSupply = 200;
 
 	function balanceOf(address _owner) constant returns (uint256 balance) {
 		return balanceBook[_owner];
